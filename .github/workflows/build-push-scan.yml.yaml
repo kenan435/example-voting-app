@@ -1,0 +1,72 @@
+name: Build, Scan, and Push Voting App Containers
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-scan-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    env:
+      SYSDIG_SECURE_URL: ${{ secrets.SYSDIG_SCANNER_URL }}     # e.g. https://eu1.app.sysdig.com
+      SYSDIG_API_TOKEN: ${{ secrets.SYSDIG_API_TOKEN }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}                     # e.g. eu-north-1
+      IMAGE_TAG: ${{ github.sha }}
+      ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Log in to Amazon ECR
+      run: |
+        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+    - name: Build Docker Images
+      run: |
+        docker build -t vote:${IMAGE_TAG} ./vote
+        docker build -t result:${IMAGE_TAG} ./result
+        docker build -t worker:${IMAGE_TAG} ./worker
+
+    - name: Download Sysdig CLI Scanner
+      run: |
+        curl -s -L "https://download.sysdig.com/scanning/bin/sysdig-cli-scanner/1.22.5/linux/amd64/sysdig-cli-scanner" -o sysdig-cli-scanner
+        chmod +x sysdig-cli-scanner
+        sudo mv sysdig-cli-scanner /usr/local/bin/
+
+    - name: Scan vote container
+      run: |
+        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log vote:${IMAGE_TAG} || exit 1
+
+    - name: Scan result container
+      run: |
+        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log result:${IMAGE_TAG} || exit 1
+
+    - name: Scan worker container
+      run: |
+        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log worker:${IMAGE_TAG} || exit 1
+
+    - name: Tag and Push Images to ECR
+      run: |
+        ECR_URL="$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+        docker tag vote:${IMAGE_TAG} $ECR_URL/vote:${IMAGE_TAG}
+        docker tag result:${IMAGE_TAG} $ECR_URL/result:${IMAGE_TAG}
+        docker tag worker:${IMAGE_TAG} $ECR_URL/worker:${IMAGE_TAG}
+
+        docker push $ECR_URL/vote:${IMAGE_TAG}
+        docker push $ECR_URL/result:${IMAGE_TAG}
+        docker push $ECR_URL/worker:${IMAGE_TAG}
