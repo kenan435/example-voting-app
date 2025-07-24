@@ -38,12 +38,12 @@ jobs:
 
     - name: Scan vote container
       run: |
-        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log --input-type docker-daemon --image vote:${IMAGE_TAG} --token $SYSDIG_API_TOKEN
+        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log --image vote:${IMAGE_TAG} --token $SYSDIG_API_TOKEN
 
     - name: Scan result container
       run: |
-        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log --input-type docker-daemon --image result:${IMAGE_TAG} --token $SYSDIG_API_TOKEN
+        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log --image vote:${IMAGE_TAG} --token $SYSDIG_API_TOKEN
 
     - name: Scan worker container
       run: |
-        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log --input-type docker-daemon --image worker:${IMAGE_TAG} --token $SYSDIG_API_TOKEN
+        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log --image vote:${IMAGE_TAG} --token $SYSDIG_API_TOKEN
