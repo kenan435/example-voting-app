@@ -37,6 +37,13 @@ jobs:
         chmod +x sysdig-cli-scanner
         sudo mv sysdig-cli-scanner /usr/local/bin/
 
+    - name: Scan Kubernetes manifests with Sysdig IaC
+      run: |
+        sysdig-cli-scanner iac kubernetes k8s/ \
+          --apiurl $SYSDIG_SECURE_URL \
+          --console-log \
+          --fail-on-high
+
     - name: Scan vote container
       run: |
         sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log vote:${IMAGE_TAG}
