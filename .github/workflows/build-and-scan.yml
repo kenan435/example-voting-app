@@ -1,0 +1,49 @@
+name: Build and Scan Voting App Containers
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    env:
+      SYSDIG_SECURE_URL: ${{ secrets.SYSDIG_SCANNER_URL }}
+      SYSDIG_API_TOKEN: ${{ secrets.SYSDIG_API_TOKEN }}
+      REGION: ${{ secrets.SYSDIG_REGION }}
+      IMAGE_TAG: ${{ github.sha }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build Docker Images
+      run: |
+        docker build -t vote:${IMAGE_TAG} ./vote
+        docker build -t result:${IMAGE_TAG} ./result
+        docker build -t worker:${IMAGE_TAG} ./worker
+
+    - name: Download Sysdig CLI Scanner
+      run: |
+        curl -s -L "https://download.sysdig.com/scanning/sysdig-cli-scanner/latest/linux/amd64/sysdig-cli-scanner" -o sysdig-cli-scanner
+        chmod +x sysdig-cli-scanner
+        sudo mv sysdig-cli-scanner /usr/local/bin/
+
+    - name: Scan vote container
+      run: |
+        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log --input-type docker-daemon --image vote:${IMAGE_TAG} --token $SYSDIG_API_TOKEN
+
+    - name: Scan result container
+      run: |
+        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log --input-type docker-daemon --image result:${IMAGE_TAG} --token $SYSDIG_API_TOKEN
+
+    - name: Scan worker container
+      run: |
+        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log --input-type docker-daemon --image worker:${IMAGE_TAG} --token $SYSDIG_API_TOKEN
