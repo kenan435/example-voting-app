@@ -38,12 +38,12 @@ jobs:
 
     - name: Scan vote container
       run: |
-        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log vote:${IMAGE_TAG} --token $SYSDIG_API_TOKEN
+        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log vote:${IMAGE_TAG}
 
     - name: Scan result container
       run: |
-        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log result:${IMAGE_TAG} --token $SYSDIG_API_TOKEN
+        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log result:${IMAGE_TAG}
 
     - name: Scan worker container
       run: |
-        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log worker:${IMAGE_TAG} --token $SYSDIG_API_TOKEN
+        sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log worker:${IMAGE_TAG}
