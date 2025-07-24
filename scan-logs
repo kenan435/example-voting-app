@@ -1,0 +1,12 @@
+{"level":"info","version":"1.22.5","commit":"4a56f83","time":"2025-07-23T20:00:28+02:00","message":"Starting analysis with Sysdig scanner"}
+{"level":"info","time":"2025-07-23T20:00:28+02:00","message":"Using path for the cache: /root/.cache/inlineScannerCache.db"}
+{"level":"info","dbVersion":"V3","time":"2025-07-23T20:00:28+02:00","message":"Vuln DB version detected"}
+{"level":"info","time":"2025-07-23T20:00:28+02:00","message":"Retrieving MainDB"}
+{"level":"info","time":"2025-07-23T20:00:28+02:00","message":"Using local MainDB located at /home/kenan/example-voting-app/main.db/sysdig-db-data since it is already up to date"}
+{"level":"info","time":"2025-07-23T20:00:28+02:00","message":"Using cached DB file on path /home/kenan/example-voting-app/main.db/sysdig-db-data"}
+{"level":"info","error":"failed parsing OnPrem version : Malformed version: ","time":"2025-07-23T20:00:28+02:00","message":"unable to get onPrem version, will assume SaaS environment"}
+{"level":"info","time":"2025-07-23T20:00:28+02:00","message":"Loading MainDB V3 from: /home/kenan/example-voting-app/main.db/sysdig-db-data"}
+{"level":"info","time":"2025-07-23T20:00:28+02:00","message":"Done: MainDB V3 loaded"}
+{"level":"info","imgName":"scan","time":"2025-07-23T20:00:28+02:00","message":"Retrieving image"}
+{"level":"info","time":"2025-07-23T20:00:29+02:00","message":"Connected to /var/run/containerd/containerd.sock containerd 1.7.27 05044ec0a9a75232cad458027ca83437aae3f4da, available namespaces: [moby]\n"}
+{"level":"error","error":"Unable to get image: image not found from loader","time":"2025-07-23T20:00:31+02:00","message":"Exiting now"}
