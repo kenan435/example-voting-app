@@ -66,7 +66,7 @@ jobs:
 
     - name: Scan Kubernetes manifests with Sysdig IaC
       run: |
-        sysdig-cli-scanner iac kubernetes k8s-specifications/ \
+        sysdig-cli-scanner iac kubernetes example-voting-app/k8s-specifications \
           --apiurl $SYSDIG_SECURE_URL \
           --console-log \
           # --fail-on-high # Remove or comment out this line
