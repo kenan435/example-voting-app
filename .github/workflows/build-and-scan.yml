@@ -36,7 +36,14 @@ jobs:
     - name: Log in to Amazon ECR
       run: |
         aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-    
+ 
+    - name: Scan Kubernetes manifests with Sysdig IaC
+      run: |
+        sysdig-cli-scanner iac /k8s-specifications \
+          --apiurl $SYSDIG_SECURE_URL \
+          --console-log \
+          # --fail-on-high # Remove or comment out this line
+
     - name: Build Docker Images
       run: |
         docker build -t vote:${IMAGE_TAG} ./vote
@@ -63,13 +70,6 @@ jobs:
       run: |
         sysdig-cli-scanner --apiurl $SYSDIG_SECURE_URL --console-log worker:${IMAGE_TAG}
       continue-on-error: true
-
-    - name: Scan Kubernetes manifests with Sysdig IaC
-      run: |
-        sysdig-cli-scanner iac kubernetes example-voting-app/k8s-specifications \
-          --apiurl $SYSDIG_SECURE_URL \
-          --console-log \
-          # --fail-on-high # Remove or comment out this line
 
     - name: Tag and Push Images to ECR
       run: |
