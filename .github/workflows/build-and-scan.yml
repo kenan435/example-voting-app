@@ -54,7 +54,7 @@ jobs:
         sysdig-cli-scanner --iac k8s-specifications/ \
           --apiurl $SYSDIG_SECURE_URL \
           --console-log \
-          # --fail-on-high # Remove or comment out this line
+          --fail-on-high # Remove or comment out this line
 
     - name: Scan vote container
       run: |
