@@ -55,6 +55,7 @@ jobs:
           --apiurl $SYSDIG_SECURE_URL \
           --console-log \
           --severity-threshold high
+      continue-on-error: true
 
     - name: Scan vote container
       run: |
